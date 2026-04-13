@@ -1,53 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DRRS1PRRQM"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="tab-title">Axios.</title>
 
-      gtag('config', 'G-DRRS1PRRQM');
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script src="/Static/Scripts/func.js"></script>
-    <title>Celestial</title>
-    <link rel="icon" href="/Static/Assets/Fav-Img/BIGFAV.png">
-    <script src="/Static/Scripts/cloak.js"></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/Static/Assets/Themes/Default.css">
-    <script src="/Static/Scripts/themes.js"></script>
-    <script src="/proto/protohandler.js"></script>
-    <script src="index.js" defer></script>
-    <script src="uv/uv.bundle.js" defer></script>
-    <script src="uv/uv.config.js" defer></script>
-    <script src="register-sw.js" defer></script>
-    <script src="search.js" defer></script>
+  <!-- Celestial-Static styles / scripts you already have -->
+  <link rel="icon" href="/Static/Assets/Fav-Img/BIGFAV.png" />
+  <link rel="stylesheet" href="/Static/Assets/Themes/Default.css" />
+
+  <style>
+    :root {
+      --bg-color: #0a0a0a; 
+      --accent-color: #39ff14; 
+      --input-bg: #1e1e1e; 
+      --text-color: #e0e0e0;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Courier New', Courier, monospace;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #matrix {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      width: 90%;
+      max-width: 800px;
+    }
+
+    .brand {
+      font-size: 3.5rem;
+      font-weight: bold;
+      color: var(--accent-color);
+      text-shadow: 0 0 20px var(--accent-color);
+      margin-bottom: 30px;
+      letter-spacing: 2px;
+    }
+
+    .search-box {
+      display: flex;
+      background: var(--input-bg);
+      padding: 10px 20px;
+      border-radius: 4px;
+      border: 1px solid var(--accent-color);
+      box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
+    }
+
+    input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      outline: none;
+      padding: 10px;
+    }
+
+    button {
+      background: transparent;
+      border: 1px solid var(--accent-color);
+      color: var(--accent-color);
+      font-weight: bold;
+      padding: 10px 20px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: var(--accent-color);
+      color: black;
+    }
+
+    .stealth-btn {
+      position: fixed;
+      bottom: 20px;
+      font-size: 0.7rem;
+      color: var(--accent-color);
+      opacity: 0.5;
+      cursor: pointer;
+      z-index: 2;
+    }
+  </style>
 </head>
 <body>
-  <div class="navbar">
-      <a href="index.html">Home</a>
-      <a href="/Static/games.html">Games</a>
-      <a href="/Static/apps.html">Apps</a>
-      <a href="/Static/movies.html">Movies</a>
-      <a href="/Static/chat.html">Chat</a>
-      <a href="/Static/settings.html">Settings</a>
-    </div>
-    <h1 class="title">Celestial</h1>
-    <form id="form" class="search-container">
-      <input id="search-engine" value="https://www.google.com/search?q=%s" type="hidden" />
-      <input id="address" type="text" placeholder="Search the web freely" />
+  <canvas id="matrix"></canvas>
+
+  <div class="container">
+    <div class="brand">Axios. (Beta) v0.3</div>
+
+    <!-- IMPORTANT: use the IDs Celestial-Static expects -->
+    <form id="form" class="search-box">
+      <input
+        id="search-engine"
+        type="hidden"
+        value="https://www.google.com/search?q=%s"
+      />
+      <input
+        type="text"
+        id="address"
+        placeholder="search anything"
+      />
+      <button type="submit">Execute</button>
     </form>
-    <div class="footer">
-      <button onclick="window.location.href='https://github.com/Toast0012'">Github</button>
-      <button onclick="window.location.href='https://discord.gg/Uk2tdG8xfF'">Discord</button>
-    </div>
-    <script type="text/javascript">
-    aclib.runAutoTag({
-        zoneId: 'rfm916j52w',
+  </div>
+
+  <div class="stealth-btn" onclick="toggleStealth()">[ STEALTH MODE ]</div>
+
+  <!-- Matrix animation -->
+  <script>
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    resizeCanvas();
+
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~";
+    const fontSize = 16;
+    let columns = canvas.width / fontSize;
+    let drops = Array(Math.floor(columns)).fill(1);
+
+    function drawMatrix() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#39ff14";
+      ctx.font = fontSize + "px monospace";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = characters.charAt(Math.floor(Math.random() * characters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+
+    setInterval(drawMatrix, 50);
+
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      columns = canvas.width / fontSize;
+      drops = Array(Math.floor(columns)).fill(1);
     });
-</script>
+
+    function toggleStealth() {
+      const title = document.getElementById('tab-title');
+      title.innerText = title.innerText.includes('Axios')
+        ? 'System Update - Windows'
+        : 'Axios.';
+    }
+  </script>
+
+  <!-- Celestial-Static proxy scripts (MUST match your repo paths) -->
+  <script src="/Static/Scripts/func.js"></script>
+  <script src="/Static/Scripts/cloak.js"></script>
+  <script src="/Static/Scripts/themes.js"></script>
+  <script src="/proto/protohandler.js"></script>
+  <script src="/uv/uv.bundle.js" defer></script>
+  <script src="/uv/uv.config.js" defer></script>
+  <script src="/register-sw.js" defer></script>
+  <script src="/index.js" defer></script>
+  <script src="/search.js" defer></script>
 </body>
 </html>
